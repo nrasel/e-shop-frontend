@@ -5,15 +5,15 @@ import ShopLogin from "../components/Shop/ShopLogin.jsx";
 
 const ShopLoginPage = () => {
   const navigate = useNavigate();
-  const { isSellerAuthenticated, seller } = useSelector(
+  const { isSellerAuthenticated, seller, isLoading } = useSelector(
     (state) => state.seller
   );
   console.log(isSellerAuthenticated);
   useEffect(() => {
     if (isSellerAuthenticated === true) {
-      navigate(`/shop/${seller?._id}`);
+      navigate(`/dashboard`);
     }
-  }, [isSellerAuthenticated, navigate, seller]);
+  }, [isSellerAuthenticated, navigate, seller, isLoading]);
   return (
     <div>
       <ShopLogin />
