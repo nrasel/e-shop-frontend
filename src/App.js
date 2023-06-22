@@ -24,7 +24,11 @@ import {
   SignupPage,
 } from "./routes/Routes.js";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
-import { ShopDashboardPage } from "./routes/ShopRoutes";
+import {
+  ShopAllProducts,
+  ShopCreateProduct,
+  ShopDashboardPage,
+} from "./routes/ShopRoutes";
 
 function App() {
   // const navigate = useNavigate();
@@ -83,11 +87,28 @@ function App() {
             }
           />
 
+          {/* dashboard route */}
           <Route
             path="/dashboard"
             element={
               <SellerProtectedRoute>
                 <ShopDashboardPage />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-create-product"
+            element={
+              <SellerProtectedRoute>
+                <ShopCreateProduct />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-products"
+            element={
+              <SellerProtectedRoute>
+                <ShopAllProducts />
               </SellerProtectedRoute>
             }
           />
