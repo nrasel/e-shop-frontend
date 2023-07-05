@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { productData } from "../../static/data";
 import styles from "../../styles/styles";
 import ProductCard from "../Route/ProductCard/ProductCard";
 
 const ShopProfileData = ({ isOwner }) => {
+  const { products } = useSelector((state) => state.products);
+  const { events } = useSelector((state) => state.events);
+  console.log(products);
   const [active, setActive] = useState(1);
   return (
     <div className="w-full">
@@ -51,12 +54,14 @@ const ShopProfileData = ({ isOwner }) => {
         </div>
       </div>
       <br />
-      <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
-        {productData &&
-          productData.map((i, index) => (
-            <ProductCard data={i} key={index} isShop={true} />
-          ))}
-      </div>
+      {active === 1 && (
+        <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
+          {products &&
+            products?.map((i, index) => (
+              <ProductCard data={i} key={index} isShop={true} />
+            ))}
+        </div>
+      )}
     </div>
   );
 };

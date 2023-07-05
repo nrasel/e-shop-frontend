@@ -26,7 +26,7 @@ export const createProduct = (newForm) => async (dispatch) => {
   }
 };
 
-// get all products
+// get all products of a shop
 export const getAllProductsShop = (id) => async (dispatch) => {
   try {
     dispatch({
@@ -47,6 +47,7 @@ export const getAllProductsShop = (id) => async (dispatch) => {
   }
 };
 
+// delete product of a shop
 export const deleteProduct = (id) => async (dispatch) => {
   try {
     dispatch({

@@ -25,7 +25,10 @@ import {
 } from "./routes/Routes.js";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {
+  ShopAllCoupouns,
+  ShopAllEvents,
   ShopAllProducts,
+  ShopCreateEvents,
   ShopCreateProduct,
   ShopDashboardPage,
 } from "./routes/ShopRoutes";
@@ -112,7 +115,32 @@ function App() {
               </SellerProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard-create-event"
+            element={
+              <SellerProtectedRoute>
+                <ShopCreateEvents />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-events"
+            element={
+              <SellerProtectedRoute>
+                <ShopAllEvents />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-coupouns"
+            element={
+              <SellerProtectedRoute>
+                <ShopAllCoupouns />
+              </SellerProtectedRoute>
+            }
+          />
         </Routes>
+
         <ToastContainer
           position="top-right"
           autoClose={5000}
