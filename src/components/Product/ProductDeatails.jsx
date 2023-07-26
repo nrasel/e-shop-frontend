@@ -1,18 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AiFillHeart,
   AiOutlineHeart,
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { addTocart } from "../../redux/actions/cart";
+import { getAllProductsShop } from "../../redux/actions/product";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../redux/actions/wishlist";
+import { backend_url } from "../../server";
 import styles from "../../styles/styles";
 
 const ProductDeatails = ({ data }) => {
+  const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { products } = useSelector((state) => state?.products);
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllProductsShop(data?._id));
+    if (wishlist && wishlist.find((i) => i?._id === data?._id)) {
+      setClick(true);
+    } else {
+      setClick(false);
+    }
+  }, [dispatch, data?._id, wishlist]);
 
   const decrementCount = () => {
     if (count > 1) {
@@ -22,6 +44,29 @@ const ProductDeatails = ({ data }) => {
   const incrementCount = () => {
     setCount(count + 1);
   };
+
+  const removeFromWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromWishlist(data));
+  };
+  const addToWishlistHandler = (data) => {
+    dispatch(addToWishlist(data));
+  };
+  const addToCartHandler = (id) => {
+    const isItemExists = cart && cart.find((i) => i._id === id);
+    if (isItemExists) {
+      toast.error("Item already in cart!");
+    } else {
+      if (data.stock < 1) {
+        toast.error("Product stock limited!");
+      } else {
+        const cartData = { ...data, qty: 1 };
+        dispatch(addTocart(cartData));
+        toast.success("Item added to cart successfully!");
+      }
+    }
+  };
+
   const handleMessageSubmit = () => {
     navigate("/inbox?conversation=50ebjver554dfs436ds");
   };
@@ -33,34 +78,38 @@ const ProductDeatails = ({ data }) => {
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
                 <img
-                  src={data.image_Url[select].url}
+                  src={`${backend_url}${data && data.images[select]}`}
                   alt=""
                   className="w-[80%]"
                 />
-                <div className="w-full flex">
-                  <div
-                    className={`${
-                      select === 0 ? "border" : "null"
-                    } cursor-pointer`}
-                  >
-                    <img
-                      src={data?.image_Url[0].url}
-                      alt=""
-                      className="h-[200px]"
-                      onClick={() => setSelect(0)}
-                    />
-                  </div>
+                <div className="w-full flex ">
+                  {data &&
+                    data.images.map((i, index) => (
+                      <div
+                        key={index}
+                        className={`${
+                          select === 0 ? "border" : "null"
+                        } cursor-pointer`}
+                      >
+                        <img
+                          src={`${backend_url}${i}`}
+                          alt=""
+                          className="h-[200px] overflow-hidden mr-2"
+                          onClick={() => setSelect(index)}
+                        />
+                      </div>
+                    ))}
                   <div
                     className={`${
                       select === 1 ? "border" : "null"
                     } cursor-pointer`}
                   >
-                    <img
-                      src={data?.image_Url[0].url}
+                    {/* <img
+                      src={`${backend_url}${data.images && data.images[0]}`}
                       alt=""
                       className="h-[200px] "
                       onClick={() => setSelect(1)}
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
@@ -69,10 +118,10 @@ const ProductDeatails = ({ data }) => {
                 <p>{data.description}</p>
                 <div className="flex pt-3">
                   <h4 className={`${styles.productDiscountPrice}`}>
-                    {data.discount_price}$
+                    {data.discountPrice}$
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.price ? data.price + "$" : null}
+                    {data.originalPrice ? data.originalPrice + "$" : null}
                   </h3>
                 </div>
                 <div className="flex items-center mt-12 justify-between pr-3">
@@ -98,7 +147,7 @@ const ProductDeatails = ({ data }) => {
                       <AiFillHeart
                         size={30}
                         className="cursor-pointer "
-                        onClick={() => setClick(!click)}
+                        onClick={() => removeFromWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Remove from wishlist"
                       />
@@ -106,7 +155,7 @@ const ProductDeatails = ({ data }) => {
                       <AiOutlineHeart
                         size={30}
                         className="cursor-pointer "
-                        onClick={() => setClick(!click)}
+                        onClick={() => addToWishlistHandler(data)}
                         color={click ? "red" : "#333"}
                         title="Add to wishlist"
                       />
@@ -114,6 +163,7 @@ const ProductDeatails = ({ data }) => {
                   </div>
                 </div>
                 <div
+                  onClick={() => addToCartHandler(data?._id)}
                   className={`${styles.button} mt-6 !rounded !h-11 flex items-center`}
                 >
                   <span className="text-white flex items-center">
@@ -121,14 +171,20 @@ const ProductDeatails = ({ data }) => {
                   </span>
                 </div>
                 <div className="flex items-center pt-8">
-                  <img
-                    src={data.shop.shop_avatar.url}
-                    className="w-[50px] rounded-full h-[50px] mr-2"
-                    alt=""
-                  />
+                  <Link to={`/shop/preview/${data?.shop?._id}`}>
+                    <img
+                      src={`${backend_url}${data?.shop?.avatar}`}
+                      className="w-[50px] rounded-full h-[50px] mr-2"
+                      alt=""
+                    />
+                  </Link>
                   <div className="pr-8">
-                    <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                    <h5 className="pb-3 text-[15px]">{data.shop.ratings}</h5>
+                    <Link to={`/shop/preview/${data?.shop?._id}`}>
+                      <h3 className={`${styles.shop_name}`}>
+                        {data?.shop.name}
+                      </h3>
+                    </Link>
+                    <h5 className="pb-3 text-[15px]">4/5</h5>
                   </div>
                   <div
                     onClick={handleMessageSubmit}
@@ -142,14 +198,14 @@ const ProductDeatails = ({ data }) => {
               </div>
             </div>
           </div>
-          <ProductDetailsInfo data={data} />
+          <ProductDetailsInfo data={data} products={products} />
         </div>
       ) : null}
     </div>
   );
 };
 
-const ProductDetailsInfo = ({ data }) => {
+const ProductDetailsInfo = ({ data, products }) => {
   const [active, setActive] = useState(1);
   return (
     <div className="bg-[#f5f6fb] px-3 800px:px-10 py-2 rounded">
@@ -191,22 +247,7 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 1 ? (
         <>
           <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure, saepe
-            dolorum veritatis voluptate qui nostrum minima ex rerum dignissimos
-            dicta similique eos, voluptatum dolorem recusandae dolores
-            voluptates alias eius laboriosam!
-          </p>
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure, saepe
-            dolorum veritatis voluptate qui nostrum minima ex rerum dignissimos
-            dicta similique eos, voluptatum dolorem recusandae dolores
-            voluptates alias eius laboriosam!
-          </p>
-          <p className="py-2 text-[18px] leading-8 pb-10 whitespace-pre-line">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure, saepe
-            dolorum veritatis voluptate qui nostrum minima ex rerum dignissimos
-            dicta similique eos, voluptatum dolorem recusandae dolores
-            voluptates alias eius laboriosam!
+            {data.description}
           </p>
         </>
       ) : null}
@@ -219,33 +260,34 @@ const ProductDetailsInfo = ({ data }) => {
       {active === 3 ? (
         <div className="w-full block 800px:flex p-5">
           <div className="w-full 800px:w-[50%]">
-            <div className="flex items-center">
-              <img
-                src={data.shop.shop_avatar.url}
-                alt=""
-                className="w-[50px] h-[50px] rounded-full"
-              />
-              <div className="pl-3">
-                <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                <h5 className="pb-2 text-[15px]">
-                  {data.shop.ratings} Ratings
-                </h5>
+            <Link to={`/shop/preview/${data.shop._id}`}>
+              <div className="flex items-center">
+                <img
+                  src={`${backend_url}${data?.shop?.avatar}`}
+                  alt=""
+                  className="w-[50px] h-[50px] rounded-full"
+                />
+                <div className="pl-3">
+                  <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
+                  <h5 className="pb-2 text-[15px]">4/5 Ratings</h5>
+                </div>
               </div>
-            </div>
-            <p className="pt-2">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
-              asperiores, modi non ipsum nisi, alias officiis libero, voluptatum
-              at laborum adipisci architecto veritatis commodi atque amet totam
-              inventore dolorum vitae!
-            </p>
+            </Link>
+            <p className="pt-2">{data.shop.description}</p>
           </div>
           <div className="w-full 800px:w-[50%] mt-5 800px:flex 800px:mt-0 flex-col items-end">
             <div className="text-left">
               <h5 className="font-[600]">
-                Joinded on: <span className="font-[500]">14 March,2023</span>
+                Joinded on:{" "}
+                <span className="font-[500]">
+                  {data.shop?.createdAt?.slice(0, 10)}
+                </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Products: <span className="font-[500]">1,223</span>
+                Total Products:{" "}
+                <span className="font-[500]">
+                  {products && products.length}
+                </span>
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Reviews: <span className="font-[500]">324</span>

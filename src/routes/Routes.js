@@ -4,6 +4,7 @@ import EventPage from "../pages/EventPage";
 import FaqPage from "../pages/FaqPage";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/Login";
+import OrderDetailsPage from "../pages/OrderDetailsPage";
 import ProductDeatailsPage from "../pages/ProductDeatailsPage";
 import ProductsPage from "../pages/ProductsPage";
 import ProfilePage from "../pages/ProfilePage";
@@ -19,6 +20,7 @@ export {
   FaqPage,
   HomePage,
   LoginPage,
+  OrderDetailsPage,
   ProductDeatailsPage,
   ProductsPage,
   ProfilePage,

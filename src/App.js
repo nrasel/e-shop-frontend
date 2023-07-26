@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { ShopHomePage } from "./ShopRoutes.js";
 import CheckoutPage from "./pages/CheckoutPage";
+import { getAllEvents } from "./redux/actions/event";
+import { getAllProducts } from "./redux/actions/product";
 import { loadSeller, loadUser } from "./redux/actions/user";
 import Store from "./redux/store";
 import ProtecTedRoute from "./routes/ProtectedRoute";
@@ -15,6 +17,7 @@ import {
   FaqPage,
   HomePage,
   LoginPage,
+  OrderDetailsPage,
   ProductDeatailsPage,
   ProductsPage,
   ProfilePage,
@@ -31,6 +34,7 @@ import {
   ShopCreateEvents,
   ShopCreateProduct,
   ShopDashboardPage,
+  ShopPreviewPage,
 } from "./routes/ShopRoutes";
 
 function App() {
@@ -39,6 +43,8 @@ function App() {
   useEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
+    Store.dispatch(getAllProducts());
+    Store.dispatch(getAllEvents());
   }, []);
   return (
     <div>
@@ -56,7 +62,7 @@ function App() {
             element={<SellerActivationPage />}
           />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/product/:name" element={<ProductDeatailsPage />} />
+          <Route path="/product/:id" element={<ProductDeatailsPage />} />
 
           <Route path="/best-selling" element={<BestSellingPage />} />
           <Route path="/events" element={<EventPage />} />
@@ -77,6 +83,15 @@ function App() {
               </ProtecTedRoute>
             }
           />
+          <Route
+            path="/user/order/:id"
+            element={
+              <ProtecTedRoute>
+                <OrderDetailsPage />
+              </ProtecTedRoute>
+            }
+          />
+          <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
 
           {/* shop route */}
           <Route path="/shop-create" element={<ShopCreatePage />} />

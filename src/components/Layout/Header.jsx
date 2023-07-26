@@ -11,7 +11,7 @@ import { RxCross1 } from "react-icons/rx";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { backend_url } from "../../server";
-import { categoriesData, productData } from "../../static/data";
+import { categoriesData } from "../../static/data";
 import styles from "../../styles/styles";
 import Cart from "../Cart/Cart";
 import Wishlist from "../Wishlist/Wishlist";
@@ -20,6 +20,9 @@ import Navbar from "./Navbar";
 
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { allProducts } = useSelector((state) => state.products);
+  const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState("");
@@ -34,8 +37,8 @@ const Header = ({ activeHeading }) => {
     setSearchTerm(term);
 
     const filteredProducts =
-      productData &&
-      productData.filter((product) =>
+      allProducts &&
+      allProducts.filter((product) =>
         product.name.toLowerCase().includes(term.toLowerCase())
       );
     setSearchData(filteredProducts);
@@ -74,13 +77,13 @@ const Header = ({ activeHeading }) => {
               <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
                 {searchData &&
                   searchData.map((i, index) => {
-                    const d = i.name;
-                    const product_name = d.replace(/\s+/g, "-");
+                    // const d = i.name;
+                    // const product_name = d.replace(/\s+/g, "-");
                     return (
-                      <Link key={index} to={`/product/${product_name}`}>
+                      <Link key={index} to={`/product/${i._id}`}>
                         <div className="w-full flex items-start-py-3">
                           <img
-                            src={i.image_Url[0].url}
+                            src={`${backend_url}${i.images[0]}`}
                             alt=""
                             className="w-[40px] mr-[10px]"
                           />
@@ -150,7 +153,7 @@ const Header = ({ activeHeading }) => {
                   style={{ color: "rgb(255 255 255 / 83%)" }}
                 />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                  0
+                  {wishlist && wishlist.length}
                 </span>
               </div>
             </div>
@@ -164,7 +167,7 @@ const Header = ({ activeHeading }) => {
                   style={{ color: "rgb(255 255 255 / 83%)" }}
                 />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
-                  0
+                  {cart && cart.length}
                 </span>
               </div>
             </div>
@@ -174,7 +177,7 @@ const Header = ({ activeHeading }) => {
                   <Link to="/profile">
                     <img
                       className="w-[35px] h-[35px] rounded-full"
-                      src={`${backend_url}${user.avatar}`}
+                      src={`${backend_url}${user?.avatar}`}
                       alt=""
                     />
                   </Link>
@@ -223,10 +226,13 @@ const Header = ({ activeHeading }) => {
             </Link>
           </div>
           <div>
-            <div className="relative mt-1 mr-[20px]">
+            <div
+              onClick={() => setOpenCart(true)}
+              className="relative cursor-pointer mt-1 mr-[20px]"
+            >
               <AiOutlineShoppingCart size={30} />
               <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0  m-0 text-white font-mono text-[12px] leading-tight text-center">
-                0
+                {cart && cart.length}
               </span>
             </div>
           </div>
