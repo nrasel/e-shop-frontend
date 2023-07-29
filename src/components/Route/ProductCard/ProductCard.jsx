@@ -24,7 +24,6 @@ const ProductCard = ({ data, isEvent }) => {
   const { cart } = useSelector((state) => state.cart);
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
-  console.log(data);
 
   useEffect(() => {
     if (wishlist && wishlist.find((i) => i._id === data._id)) {

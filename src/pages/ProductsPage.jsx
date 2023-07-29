@@ -13,8 +13,7 @@ const ProductsPage = () => {
 
   useEffect(() => {
     if (categoryData === null) {
-      const d =
-        allProducts && allProducts.sort((a, b) => a.sold_out - b.sold_out);
+      const d = allProducts;
       setData(d);
     } else {
       const d =
@@ -22,7 +21,7 @@ const ProductsPage = () => {
       setData(d);
     }
     // window.scrollTo(0,0)
-  }, [allProducts]);
+  }, [allProducts, categoryData]);
   return (
     <div>
       <div>

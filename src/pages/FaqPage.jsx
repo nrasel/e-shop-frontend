@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../components/Layout/Footer";
 import Header from "../components/Layout/Header";
 import styles from "../styles/styles";
@@ -23,6 +23,9 @@ const Faq = () => {
       setActiveTab(tab);
     }
   };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className={`${styles.section} my-8`}>
       <h2 className="text-3xl font-bold text-gray-900 mb-8">FAQ</h2>
