@@ -19,13 +19,44 @@ const CheckOut = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
   const [discountPrice, setDiscountPrice] = useState(null);
+  console.log(discountPrice);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   const navigate = useNavigate();
   const paymentSubmit = () => {
-    navigate("/payment");
+    if (
+      address1 === "" ||
+      address2 === "" ||
+      zipCode === "" ||
+      country === "" ||
+      city === ""
+    ) {
+      toast.error("Please choose your delivery address!");
+    } else {
+      const shippingAddress = {
+        address1,
+        address2,
+        zipCode,
+        country,
+        city,
+      };
+
+      const orderData = {
+        cart,
+        totalPrice,
+        subTotalPrice,
+        shipping,
+        discountPrice,
+        shippingAddress,
+        user,
+      };
+
+      // update local storagge with the updated orders array
+      localStorage.setItem("latestOrder", JSON.stringify(orderData));
+      navigate("/payment");
+    }
   };
 
   const subTotalPrice = cart.reduce(
@@ -39,16 +70,34 @@ const CheckOut = () => {
     e.preventDefault();
     const name = couponCode;
     await axios.get(`${server}/coupon/get-coupon-value/${name}`).then((res) => {
-      console.log(res.data);
+      const shopId = res.data.couponCode?.shopId;
+      const couponCodeValue = res.data.couponCode?.value;
+      console.log(couponCodeValue);
+      if (res.data.couponCode !== null) {
+        const isCouponValid =
+          cart && cart.filter((item) => item.shopId === shopId);
+        if (isCouponValid.length === 0) {
+          toast.error("Coupon code is not valid for this shop");
+          setCouponCode("");
+        } else {
+          const eligiblePrice = isCouponValid.reduce(
+            (acc, item) => acc + item.qty * item.discountPrice,
+            0
+          );
+          const discountPrice = (eligiblePrice * couponCodeValue) / 100;
+
+          setDiscountPrice(discountPrice);
+          setCouponCodeData(res.data.couponCode);
+          setCouponCode("");
+        }
+      }
       if (res.data.couponCode === null) {
         toast.error("Coupon code doesn't exists!");
         setCouponCode("");
       }
     });
   };
-  const discountPercentage = couponCodeData
-    ? (subTotalPrice * couponCodeData.value) / 100
-    : "";
+  const discountPercentage = couponCodeData ? discountPrice : "";
 
   const totalPrice = couponCodeData
     ? (subTotalPrice + shipping - discountPercentage).toFixed(2)
@@ -266,8 +315,9 @@ const CartData = ({
   subTotalPrice,
   couponCode,
   setCouponCode,
-  discountPercentenge,
+  discountPercentage,
 }) => {
+  console.log(discountPercentage);
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
       <div className="flex justify-between">
@@ -283,7 +333,7 @@ const CartData = ({
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">
-          - {discountPercentenge ? "$" + discountPercentenge.toString() : null}
+          - {discountPercentage ? "$" + discountPercentage.toString() : null}
         </h5>
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
