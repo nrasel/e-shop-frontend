@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { ShopHomePage } from "./ShopRoutes.js";
 import CheckoutPage from "./pages/CheckoutPage";
+import PaymentPage from "./pages/PaymentPage";
 import { getAllEvents } from "./redux/actions/event";
 import { getAllProducts } from "./redux/actions/product";
 import { loadSeller, loadUser } from "./redux/actions/user";
@@ -39,6 +42,9 @@ import {
 
 function App() {
   // const navigate = useNavigate();
+  const [stripeApikey, setStripeApiKey] = useState(
+    "('pk_test_TYooMQauvdEDq54NiTphI7jx')"
+  );
 
   useEffect(() => {
     Store.dispatch(loadUser());
@@ -49,6 +55,18 @@ function App() {
   return (
     <div>
       <BrowserRouter>
+        <Elements stripe={loadStripe(stripeApikey)}>
+          <Routes>
+            <Route
+              path="/payment"
+              element={
+                <ProtecTedRoute>
+                  <PaymentPage />
+                </ProtecTedRoute>
+              }
+            />
+          </Routes>
+        </Elements>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
