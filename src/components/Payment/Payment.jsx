@@ -4,14 +4,38 @@ import {
   CardExpiryElement,
   CardNumberElement,
 } from "@stripe/react-stripe-js";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RxCross1 } from "react-icons/rx";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import styles from "../../styles/styles";
 
 const Payment = () => {
   const { user } = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
+  const [orderData, setOrderData] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const orderData = JSON.parse(localStorage.getItem("latestOrder"));
+    setOrderData(orderData);
+  }, []);
+
+  const createOrder = (data, actions) => {
+    console.log("add");
+  };
+  const onApprove = async (data, actions) => {
+    console.log("add");
+  };
+
+  const paypalPaymentHandler = async (paymentInfo) => {};
+  const paymentData = {
+    amount: Math.round(orderData?.totalPrice * 100),
+  };
+
+  const cashOnDeliveryHandler = async (e) => {
+    e.preventDefault();
+  };
 
   const paymentHandler = (e) => {
     e.preventDefault();
@@ -25,17 +49,28 @@ const Payment = () => {
             paymentHandler={paymentHandler}
             open={open}
             setOpen={setOpen}
+            onApprove={onApprove}
+            createOrder={createOrder}
+            cashOnDeliveryHandler={cashOnDeliveryHandler}
           />
         </div>
         <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-          <CardData />
+          <CardData orderData={orderData} />
         </div>
       </div>
     </div>
   );
 };
 
-const PaymentInfo = ({ user, paymentHandler, open, setOpen }) => {
+const PaymentInfo = ({
+  user,
+  paymentHandler,
+  open,
+  setOpen,
+  onApprove,
+  createOrder,
+  cashOnDeliveryHandler,
+}) => {
   const [select, setSelect] = useState(1);
   return (
     <div className="w-full 800px:w-[95%] bg-[#fff] rounded-mb p-5 pb-8">
@@ -230,8 +265,32 @@ const PaymentInfo = ({ user, paymentHandler, open, setOpen }) => {
   );
 };
 
-const CardData = () => {
-  return <div></div>;
+const CardData = ({ orderData }) => {
+  const shipping = orderData?.shipping?.toFixed(2);
+  return (
+    <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
+      <div className="flex justify-between">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
+        <h5 className="text-[18px] font-[600]">$ {orderData?.subTotalPrice}</h5>
+      </div>
+      <br />
+      <div className="flex justify-between">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
+        <h5 className="text-[18px] font-[600]">$ {shipping}</h5>
+      </div>
+      <br />
+      <div className="flex justify-between border-b pb-3">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
+        <h5 className="text-[18px] font-[600]">
+          {orderData?.discountPrice ? "$ " + orderData.discountPrice : "-"}
+        </h5>
+      </div>
+      <h5 className="flex justify-between text-[18px] font-[600] text-end pt-3">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">Total:</h3>
+        <h5 className="text-[18px] font-[600]">$ {orderData?.totalPrice}</h5>
+      </h5>
+    </div>
+  );
 };
 
 export default Payment;
