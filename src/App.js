@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { ShopHomePage } from "./ShopRoutes.js";
 import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 import PaymentPage from "./pages/PaymentPage";
 import { getAllEvents } from "./redux/actions/event";
 import { getAllProducts } from "./redux/actions/product";
@@ -91,6 +92,7 @@ function App() {
           />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/product/:id" element={<ProductDeatailsPage />} />
+          {/* <Route path="/event/:id" element={<EventDetailsPage />} /> */}
 
           <Route path="/best-selling" element={<BestSellingPage />} />
           <Route path="/events" element={<EventPage />} />
@@ -103,6 +105,7 @@ function App() {
               </ProtecTedRoute>
             }
           />
+          <Route path="/order/success" element={<OrderSuccessPage />} />
           <Route
             path="/profile"
             element={
