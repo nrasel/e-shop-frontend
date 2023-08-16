@@ -6,6 +6,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { RxCross1 } from "react-icons/rx";
@@ -29,13 +30,59 @@ const Payment = () => {
   }, []);
 
   const createOrder = (data, actions) => {
-    console.log("add");
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            description: "Sunflower",
+            amount: {
+              currency_code: "USD",
+              value: orderData?.totalPrice,
+            },
+          },
+        ],
+        application_context: {
+          shipping_preference: "NO_SHIPPING",
+        },
+      })
+      .then((orderId) => {
+        return orderId;
+      });
   };
   const onApprove = async (data, actions) => {
-    console.log("add");
+    return actions.order.capture().then(function (details) {
+      const { payer } = details;
+      let paymentInfo = payer;
+
+      if (paymentInfo !== undefined) {
+        paypalPaymentHandler(paymentInfo);
+      }
+    });
   };
 
-  const paypalPaymentHandler = async (paymentInfo) => {};
+  const paypalPaymentHandler = async (paymentInfo) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    order.paymentInfo = {
+      id: paymentInfo.paer_id,
+      status: "succeeded",
+      type: "Paypal",
+    };
+    await axios
+      .post(`${server}/order/create-order`, order, config)
+      .then((res) => {
+        setOpen(false);
+        navigate("/order/success");
+        toast.success("Order successful!");
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        localStorage.setItem("latestOrder", JSON.stringify([]));
+        window.location.reload();
+      });
+  };
 
   const cashOnDeliveryHandler = async (e) => {
     e.preventDefault();
@@ -284,10 +331,14 @@ const PaymentInfo = ({
                   <PayPalScriptProvider
                     options={{
                       "client-id":
-                        "Aczac4Ry9_QA1t4c7TKH9UusH3RTe6onyICPoCToHG10kjlNdI-qwobbW9JAHzaRQwFMn2-k660853jn",
+                        "AY8Tyxj6vUYhdh9WA1F6InKOU5NhBpffmEY6nwy82rhFirUgux5GrUdyzgjJf4rl5MmEoT2FEbOZDpAs",
                     }}
                   >
-                    <PayPalButtons style={{ layout: "vertical" }} />
+                    <PayPalButtons
+                      onApprove={onApprove}
+                      createOrder={createOrder}
+                      style={{ layout: "vertical" }}
+                    />
                   </PayPalScriptProvider>
                 </div>
               </div>
