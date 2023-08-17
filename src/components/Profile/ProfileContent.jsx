@@ -13,6 +13,7 @@ import { RxCross1 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getAllOrdersOfUser } from "../../redux/actions/order";
 import {
   deleteUserAddress,
   updateUserAddress,
@@ -190,19 +191,14 @@ const ProfileContent = ({ active }) => {
 };
 
 const AllOrders = () => {
-  const orders = [
-    {
-      _id: "74038340jgd934434",
-      orderItems: [
-        {
-          name: "Iphone 14 pro max",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
+  const { orders } = useSelector((state) => state.order);
+  const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(getAllOrdersOfUser(user._id));
+  }, [user._id, dispatch]);
+  console.log(orders);
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
@@ -257,12 +253,11 @@ const AllOrders = () => {
   const row = [];
   orders &&
     orders.forEach((item) => {
-      console.log(item.orderItems.length);
       row.push({
         id: item._id,
-        itemsQty: item.orderItems.length,
+        itemsQty: item.cart.length,
         total: "US$ " + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
 

@@ -2,28 +2,24 @@ import React, { useEffect, useState } from "react";
 import { BsFillBagFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-// import { getAllOrdersOfShop } from "../../redux/actions/order";
-// import { backend_url } from "../../server";
-import { getAllOrdersOfUser } from "../redux/actions/order";
-import { backend_url } from "../server";
-import styles from "../styles/styles";
-// import styles from "../../styles/styles";
+import { getAllOrdersOfShop } from "../../redux/actions/order";
+import { backend_url } from "../../server";
+import styles from "../../styles/styles";
 
-const UserOrderDetails = () => {
+const OrderDetails = () => {
   const { orders } = useSelector((state) => state.order);
-  const { user } = useSelector((state) => state.user);
+  const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const { id } = useParams();
-  console.log(user);
+
   useEffect(() => {
-    dispatch(getAllOrdersOfUser(user?._id));
-  }, [user?._id, dispatch]);
+    dispatch(getAllOrdersOfShop(seller._id));
+  }, [seller._id]);
 
   const orderUpdateHandler = (e) => {};
 
   const data = orders && orders.find((item) => item._id === id);
-  console.log(data);
 
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
@@ -32,6 +28,13 @@ const UserOrderDetails = () => {
           <BsFillBagFill size={30} color="crimson" />
           <h1 className="pl-2 text-[25px]">Order Details</h1>
         </div>
+        <Link to="/dashboard-orders">
+          <div
+            className={`${styles.button} !bg-[#fce1e6] !rounded-[4px] text-[#e94560] font[600] !h-[45px] text-[18px]`}
+          >
+            Order list
+          </div>
+        </Link>
       </div>
 
       <div className="w-full flex items-center justify-between pt-6">
@@ -60,6 +63,11 @@ const UserOrderDetails = () => {
                 US$ {item.discountPrice} X {item.qty}
               </h5>
             </div>
+            {data?.status === "Delivered" && (
+              <div className={`${styles.button} text-[#fff]`}>
+                Write a review
+              </div>
+            )}
           </div>
         ))}
       <div className="border-t w-full text-right">
@@ -73,29 +81,22 @@ const UserOrderDetails = () => {
         <div className="w-full 800px:w-[60%]">
           <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
           <h4 className="pt-3 text-[20px] font-[600]">
-            {data?.shippingAddress?.address1 +
+            {data?.shippingAddress.address1 +
               " " +
-              data?.shippingAddress?.address2}
+              data.shippingAddress.address2}
           </h4>
-          <h4 className="text-[20px]">{data?.shippingAddress?.country}</h4>
-          <h4 className="text-[20px]">{data?.shippingAddress?.city}</h4>
+          <h4 className="text-[20px]">{data?.shippingAddress.country}</h4>
+          <h4 className="text-[20px]">{data?.shippingAddress.city}</h4>
           <h4 className="text-[20px]">{data?.user?.phoneNumber}</h4>
         </div>
         <div className="w-full 800px:w-[40%]">
           <h4 className="pt-3 text-[20px] font-[600]">Payment Info:</h4>
-          <h4>
+          <h4 className="">
             Status :
             {data?.paymentInfo.status ? data?.paymentInfo.status : " Not paid"}
           </h4>
         </div>
       </div>
-
-      <br />
-      <Link to="/">
-        <div className={`${styles.button} text-white`}>Send Message</div>
-      </Link>
-      <br />
-      <br />
       <h4 className="pt-3 text-[20px] font-[600]">Order Status:</h4>
       <select
         name=""
@@ -138,4 +139,4 @@ const UserOrderDetails = () => {
   );
 };
 
-export default UserOrderDetails;
+export default OrderDetails;

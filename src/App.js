@@ -35,10 +35,12 @@ import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {
   ShopAllCoupouns,
   ShopAllEvents,
+  ShopAllOrders,
   ShopAllProducts,
   ShopCreateEvents,
   ShopCreateProduct,
   ShopDashboardPage,
+  ShopOrderDetails,
   ShopPreviewPage,
 } from "./routes/ShopRoutes";
 import { server } from "./server";
@@ -122,6 +124,14 @@ function App() {
               </ProtecTedRoute>
             }
           />
+          <Route
+            path="/user/order/:id"
+            element={
+              <ProtecTedRoute>
+                <OrderDetailsPage />
+              </ProtecTedRoute>
+            }
+          />
           <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
 
           {/* shop route */}
@@ -150,6 +160,22 @@ function App() {
             element={
               <SellerProtectedRoute>
                 <ShopCreateProduct />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-orders"
+            element={
+              <SellerProtectedRoute>
+                <ShopAllOrders />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/order/:id"
+            element={
+              <SellerProtectedRoute>
+                <ShopOrderDetails />
               </SellerProtectedRoute>
             }
           />

@@ -1,17 +1,21 @@
 import ShopAllCoupouns from "../pages/Shop/ShopAllCoupouns";
 import ShopAllEvents from "../pages/Shop/ShopAllEvents";
+import ShopAllOrders from "../pages/Shop/ShopAllOrders";
 import ShopAllProducts from "../pages/Shop/ShopAllProducts";
 import ShopCreateEvents from "../pages/Shop/ShopCreateEvents";
 import ShopCreateProduct from "../pages/Shop/ShopCreateProduct";
 import ShopDashboardPage from "../pages/Shop/ShopDashboardPage";
+import ShopOrderDetails from "../pages/Shop/ShopOrderDetails";
 import ShopPreviewPage from "../pages/Shop/ShopPreviewPage";
 
 export {
   ShopAllCoupouns,
   ShopAllEvents,
+  ShopAllOrders,
   ShopAllProducts,
   ShopCreateEvents,
   ShopCreateProduct,
   ShopDashboardPage,
+  ShopOrderDetails,
   ShopPreviewPage,
 };
