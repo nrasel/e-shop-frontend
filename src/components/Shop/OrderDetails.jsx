@@ -1,25 +1,47 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BsFillBagFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { getAllOrdersOfShop } from "../../redux/actions/order";
-import { backend_url } from "../../server";
+import { backend_url, server } from "../../server";
 import styles from "../../styles/styles";
 
 const OrderDetails = () => {
   const { orders } = useSelector((state) => state.order);
   const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [status, setStatus] = useState("");
+
   const { id } = useParams();
 
   useEffect(() => {
     dispatch(getAllOrdersOfShop(seller._id));
   }, [seller._id]);
 
-  const orderUpdateHandler = (e) => {};
+  // const orderUpdateHandler = (e) => {};
 
   const data = orders && orders.find((item) => item._id === id);
+
+  const orderUpdateHandler = async (e) => {
+    await axios
+      .put(
+        `${server}/order/update-order-status/${id}`,
+        {
+          status,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        toast.success("Order updated!");
+        navigate("/dashboard-orders");
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  };
 
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
@@ -60,16 +82,12 @@ const OrderDetails = () => {
             <div className="w-full">
               <h5 className="pl-3 text-[20px]">{item.name}</h5>
               <h5 className="pl-3 text-[20px] text-[##00000091]">
-                US$ {item.discountPrice} X {item.qty}
+                US$ {item?.discountPrice} X {item.qty}
               </h5>
             </div>
-            {data?.status === "Delivered" && (
-              <div className={`${styles.button} text-[#fff]`}>
-                Write a review
-              </div>
-            )}
           </div>
         ))}
+
       <div className="border-t w-full text-right">
         <div className="pt-3 text-[18px]">
           Total Price : <strong>US$ {data?.totalPrice}</strong>
@@ -81,19 +99,21 @@ const OrderDetails = () => {
         <div className="w-full 800px:w-[60%]">
           <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
           <h4 className="pt-3 text-[20px] font-[600]">
-            {data?.shippingAddress.address1 +
+            {data?.shippingAddress?.address1 +
               " " +
-              data.shippingAddress.address2}
+              data?.shippingAddress?.address2}
           </h4>
-          <h4 className="text-[20px]">{data?.shippingAddress.country}</h4>
-          <h4 className="text-[20px]">{data?.shippingAddress.city}</h4>
+          <h4 className="text-[20px]">{data?.shippingAddress?.country}</h4>
+          <h4 className="text-[20px]">{data?.shippingAddress?.city}</h4>
           <h4 className="text-[20px]">{data?.user?.phoneNumber}</h4>
         </div>
         <div className="w-full 800px:w-[40%]">
           <h4 className="pt-3 text-[20px] font-[600]">Payment Info:</h4>
           <h4 className="">
             Status :
-            {data?.paymentInfo.status ? data?.paymentInfo.status : " Not paid"}
+            {data?.paymentInfo?.status
+              ? data?.paymentInfo?.status
+              : " Not paid"}
           </h4>
         </div>
       </div>
@@ -111,7 +131,7 @@ const OrderDetails = () => {
           "Shipping",
           "Received",
           "On the way",
-          "delivered",
+          "Delivered",
         ]
           .slice(
             [
@@ -120,7 +140,7 @@ const OrderDetails = () => {
               "Shipping",
               "Received",
               "On the way",
-              "delivered",
+              "Delivered",
             ].indexOf(data?.status)
           )
           .map((option, index) => (
