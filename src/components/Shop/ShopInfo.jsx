@@ -1,12 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { backend_url, server } from "../../server";
 import styles from "../../styles/styles";
 
 const ShopInfo = ({ isOwner }) => {
+  const { products } = useSelector((state) => state?.products);
   const [data, setData] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [setIsLoading] = useState(false);
   const { id } = useParams();
   useEffect(() => {
     setIsLoading(true);
@@ -25,6 +27,19 @@ const ShopInfo = ({ isOwner }) => {
     axios.get(`${server}/shop/shop-logout`, { withCredentials: true });
     window.location.reload();
   };
+  const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
+
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating0),
+      0
+    );
+
+  const averageRating = totalRatings / totalReviewsLength || 0;
   return (
     <div>
       <div className="w-full py-5">
@@ -50,11 +65,11 @@ const ShopInfo = ({ isOwner }) => {
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Total Products</h5>
-        <h4 className="text-[#000000a6]">10</h4>
+        <h4 className="text-[#000000a6]"> {products && products.length}</h4>
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Shop Ratings</h5>
-        <h4 className="text-[#000000a6]">4/5</h4>
+        <h4 className="text-[#000000a6]">{averageRating.toFixed(1)}</h4>
       </div>
       <div className="p-3">
         <h5 className="font-[600]">Joined On</h5>

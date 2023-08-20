@@ -16,6 +16,7 @@ import {
 } from "../../redux/actions/wishlist";
 import { backend_url } from "../../server";
 import styles from "../../styles/styles";
+import Ratings from "./Ratings";
 
 const ProductDeatails = ({ data }) => {
   const { cart } = useSelector((state) => state.cart);
@@ -28,13 +29,13 @@ const ProductDeatails = ({ data }) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getAllProductsShop(data?._id));
+    dispatch(getAllProductsShop(data && data?.shop._id));
     if (wishlist && wishlist.find((i) => i?._id === data?._id)) {
       setClick(true);
     } else {
       setClick(false);
     }
-  }, [dispatch, data?._id, wishlist]);
+  }, [dispatch, data, data?.shop._id, wishlist]);
 
   const decrementCount = () => {
     if (count > 1) {
@@ -67,9 +68,26 @@ const ProductDeatails = ({ data }) => {
     }
   };
 
+  const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
+
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
+      0
+    );
+
+  const avg = totalRatings / totalReviewsLength || 0;
+
+  const averageRating = avg.toFixed(1);
+
   const handleMessageSubmit = () => {
     navigate("/inbox?conversation=50ebjver554dfs436ds");
   };
+
   return (
     <div className="bg-white ">
       {data ? (
@@ -198,14 +216,24 @@ const ProductDeatails = ({ data }) => {
               </div>
             </div>
           </div>
-          <ProductDetailsInfo data={data} products={products} />
+          <ProductDetailsInfo
+            data={data}
+            products={products}
+            totalReviewsLength={totalReviewsLength}
+            averageRating={averageRating}
+          />
         </div>
       ) : null}
     </div>
   );
 };
 
-const ProductDetailsInfo = ({ data, products }) => {
+const ProductDetailsInfo = ({
+  data,
+  products,
+  totalReviewsLength,
+  averageRating,
+}) => {
   const [active, setActive] = useState(1);
   return (
     <div className="bg-[#f5f6fb] px-3 800px:px-10 py-2 rounded">
@@ -253,8 +281,30 @@ const ProductDetailsInfo = ({ data, products }) => {
       ) : null}
 
       {active === 2 ? (
-        <div className="w-full justify-center min-h-[40vh] flex items-center">
-          <p>No Review yet!</p>
+        <div className="w-full py-3 min-h-[40vh] flex flex-col items-center">
+          {data &&
+            data.reviews.map((item, index) => (
+              <div className="w-full flex my-2">
+                <img
+                  src={`${backend_url}/${item.user.avatar}`}
+                  className="w-[50px] h-[50px] rounded-full"
+                  alt=""
+                />
+                <div className="pl-2">
+                  <div className="w-full flex items-center">
+                    <h1 className="pl-2 font-[500] mr-2">{item.user.name}</h1>
+                    <Ratings rating={data?.ratings} />
+                  </div>
+                  <p className="pl-2">{item.comment}</p>
+                </div>
+              </div>
+            ))}
+
+          <div className="w-full flex  justify-center">
+            {data && data.reviews.length === 0 && (
+              <h5>No Reviews have for this product!</h5>
+            )}
+          </div>
         </div>
       ) : null}
       {active === 3 ? (
@@ -269,7 +319,9 @@ const ProductDetailsInfo = ({ data, products }) => {
                 />
                 <div className="pl-3">
                   <h3 className={`${styles.shop_name}`}>{data.shop.name}</h3>
-                  <h5 className="pb-2 text-[15px]">4/5 Ratings</h5>
+                  <h5 className="pb-2 text-[15px]">
+                    ({averageRating})/5 Ratings
+                  </h5>
                 </div>
               </div>
             </Link>
@@ -284,13 +336,14 @@ const ProductDetailsInfo = ({ data, products }) => {
                 </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Products:{" "}
+                Total Products:
                 <span className="font-[500]">
                   {products && products.length}
                 </span>
               </h5>
               <h5 className="font-[600] pt-3">
-                Total Reviews: <span className="font-[500]">324</span>
+                Total Reviews:{" "}
+                <span className="font-[500]">{totalReviewsLength}</span>
               </h5>
               <Link to="/">
                 <div
