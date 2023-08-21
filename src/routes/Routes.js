@@ -12,6 +12,7 @@ import SellerActivationPage from "../pages/SellerActivationPage";
 import ShopCreatePage from "../pages/ShopCreatePage.jsx";
 import ShopLoginPage from "../pages/ShopLoginPage";
 import SignupPage from "../pages/SignupPage";
+import TrackOrderPage from "../pages/TrackOrderPage";
 
 export {
   ActivationPage,
@@ -28,4 +29,5 @@ export {
   ShopCreatePage,
   ShopLoginPage,
   SignupPage,
+  TrackOrderPage,
 };

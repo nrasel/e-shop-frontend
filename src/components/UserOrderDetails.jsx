@@ -20,15 +20,12 @@ const UserOrderDetails = () => {
   const [comment, setComment] = useState();
   const [rating, setRating] = useState(1);
   const { id } = useParams();
-  console.log(user);
+
   useEffect(() => {
     dispatch(getAllOrdersOfUser(user?._id));
   }, [dispatch, user?._id]);
 
-  console.log(orders);
-
   const data = orders && orders.find((item) => item._id === id);
-  console.log(data?.cart);
 
   const reviewHandler = async (e) => {
     await axios
@@ -52,6 +49,16 @@ const UserOrderDetails = () => {
       })
       .catch((error) => {
         toast.error(error);
+      });
+  };
+
+  const refundHandler = async () => {
+    await axios
+      .put(`${server}/order/order-refund/${id}`, {
+        status: "Processing Refund",
+      })
+      .then((res) => {
+        toast.success(res.data.message);
       });
   };
 
@@ -90,7 +97,7 @@ const UserOrderDetails = () => {
                 US$ {item.discountPrice} X {item.qty}
               </h5>
             </div>
-            {item.isReviewed ? null : (
+            {item.isReviewed || item.stat ? null : (
               <div
                 className={`${styles.button} text-[#fff]`}
                 onClick={() => setOpen(true) || setSelectedItem(item)}
@@ -213,7 +220,7 @@ const UserOrderDetails = () => {
           {data?.status === "Delivered" && (
             <div
               className={`${styles.button} text-white`}
-              // onClick={refundHandler}
+              onClick={refundHandler}
             >
               Give a Refund
             </div>
@@ -225,6 +232,7 @@ const UserOrderDetails = () => {
       <Link to="/">
         <div className={`${styles.button} text-white`}>Send Message</div>
       </Link>
+
       <br />
       <br />
     </div>

@@ -30,6 +30,7 @@ import {
   ShopCreatePage,
   ShopLoginPage,
   SignupPage,
+  TrackOrderPage,
 } from "./routes/Routes.js";
 import SellerProtectedRoute from "./routes/SellerProtectedRoute";
 import {
@@ -37,6 +38,7 @@ import {
   ShopAllEvents,
   ShopAllOrders,
   ShopAllProducts,
+  ShopAllRefunds,
   ShopCreateEvents,
   ShopCreateProduct,
   ShopDashboardPage,
@@ -132,6 +134,14 @@ function App() {
               </ProtecTedRoute>
             }
           />
+          <Route
+            path="/user/track/order/:id"
+            element={
+              <ProtecTedRoute>
+                <TrackOrderPage />
+              </ProtecTedRoute>
+            }
+          />
           <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
 
           {/* shop route */}
@@ -168,6 +178,14 @@ function App() {
             element={
               <SellerProtectedRoute>
                 <ShopAllOrders />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard-refunds"
+            element={
+              <SellerProtectedRoute>
+                <ShopAllRefunds />
               </SellerProtectedRoute>
             }
           />
