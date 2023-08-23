@@ -8,6 +8,7 @@ import ShopCreateProduct from "../pages/Shop/ShopCreateProduct";
 import ShopDashboardPage from "../pages/Shop/ShopDashboardPage";
 import ShopOrderDetails from "../pages/Shop/ShopOrderDetails";
 import ShopPreviewPage from "../pages/Shop/ShopPreviewPage";
+import ShopSettingsPage from "../pages/Shop/ShopSettingsPage";
 
 export {
   ShopAllCoupouns,
@@ -20,4 +21,5 @@ export {
   ShopDashboardPage,
   ShopOrderDetails,
   ShopPreviewPage,
+  ShopSettingsPage,
 };

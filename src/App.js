@@ -44,6 +44,7 @@ import {
   ShopDashboardPage,
   ShopOrderDetails,
   ShopPreviewPage,
+  ShopSettingsPage,
 } from "./routes/ShopRoutes";
 import { server } from "./server";
 
@@ -152,6 +153,14 @@ function App() {
             element={
               <SellerProtectedRoute>
                 <ShopHomePage />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <SellerProtectedRoute>
+                <ShopSettingsPage />
               </SellerProtectedRoute>
             }
           />

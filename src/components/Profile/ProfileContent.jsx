@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { getAllOrdersOfUser } from "../../redux/actions/order";
 import {
   deleteUserAddress,
+  loadSeller,
   updateUserAddress,
   updateUserInformation,
 } from "../../redux/actions/user";
@@ -61,7 +62,8 @@ const ProfileContent = ({ active }) => {
         withCredentials: true,
       })
       .then((res) => {
-        window.location.reload();
+        dispatch(loadSeller());
+        toast.success("Avatar updated successfully!");
       })
       .catch((err) => {
         toast.error(error);
