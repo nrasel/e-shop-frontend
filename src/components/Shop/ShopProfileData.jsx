@@ -8,7 +8,7 @@ import Ratings from "../Product/Ratings";
 import ProductCard from "../Route/ProductCard/ProductCard";
 
 const ShopProfileData = ({ isOwner }) => {
-  const { events } = useSelector((state) => state.events);
+  // const { events } = useSelector((state) => state.events);
   const { products } = useSelector((state) => state?.products);
   const { id } = useParams();
   const dispatch = useDispatch();
