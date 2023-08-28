@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import { getAllEventsShop } from "../../redux/actions/event";
 import { getAllProductsShop } from "../../redux/actions/product";
 import { backend_url } from "../../server";
 import styles from "../../styles/styles";
@@ -8,13 +9,16 @@ import Ratings from "../Product/Ratings";
 import ProductCard from "../Route/ProductCard/ProductCard";
 
 const ShopProfileData = ({ isOwner }) => {
-  // const { events } = useSelector((state) => state.events);
+  const { events } = useSelector((state) => state.events);
+  const { seller } = useSelector((state) => state.seller);
   const { products } = useSelector((state) => state?.products);
   const { id } = useParams();
   const dispatch = useDispatch();
+  console.log(events);
   useEffect(() => {
     dispatch(getAllProductsShop(id));
-  }, [dispatch, id]);
+    dispatch(getAllEventsShop(seller?._id));
+  }, [dispatch, id, seller?._id]);
   const [active, setActive] = useState(1);
   const allReviews =
     products && products.map((product) => product.reviews).flat();
@@ -72,6 +76,15 @@ const ShopProfileData = ({ isOwner }) => {
         </div>
       )}
 
+      {active === 2 && (
+        <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
+          {events &&
+            events?.map((i, index) => (
+              <ProductCard data={i} key={index} isShop={true} isEvent={true} />
+            ))}
+        </div>
+      )}
+
       {active === 3 && (
         <div className="w-full">
           {allReviews &&
@@ -88,7 +101,9 @@ const ShopProfileData = ({ isOwner }) => {
                     <Ratings rating={item.rating} />
                   </div>
                   <p className="font-[400] text-[#000000a7]">{item?.comment}</p>
-                  <p className="text-[#000000a7] text-[14px]">{"2days ago"}</p>
+                  <p className="text-[#000000a7] text-[14px]">
+                    {item?.createdAt.slice(0, 10)}
+                  </p>
                 </div>
               </div>
             ))}

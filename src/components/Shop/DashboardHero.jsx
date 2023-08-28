@@ -23,6 +23,12 @@ const DashboardHero = () => {
     setDeliveredOrder(orderData);
   }, [orders, seller._id, dispatch]);
 
+  const totalEarningWithoutTax =
+    deliveredOrder &&
+    deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0);
+  const serviceCharge = totalEarningWithoutTax * 0.1;
+  const availableBalance = totalEarningWithoutTax - serviceCharge;
+
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
@@ -86,11 +92,6 @@ const DashboardHero = () => {
       });
     });
 
-  const totalEarningWithoutTax =
-    deliveredOrder &&
-    deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0);
-  const serviceCharge = totalEarningWithoutTax * 0.1;
-  const availableBalance = totalEarningWithoutTax - serviceCharge;
   return (
     <div className="w-full p-8">
       <h3 className="text-[22px] font-Poppins pb-2">Overview</h3>

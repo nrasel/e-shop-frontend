@@ -11,10 +11,12 @@ const AllEvents = () => {
   const { events, isLoading } = useSelector((state) => state.events);
   const { seller } = useSelector((state) => state.seller);
 
+  console.log(events);
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getAllEventsShop(seller?._id));
-  }, [dispatch, seller._id]);
+  }, [dispatch]);
 
   const handleDelete = (id) => {
     console.log(id);
