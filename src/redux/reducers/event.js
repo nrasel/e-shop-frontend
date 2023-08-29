@@ -50,7 +50,6 @@ export const eventReducer = createReducer(initialState, {
     state.isLoading = true;
   },
   getAlleventsSuccess: (state, action) => {
-    console.log(action.payload);
     state.isLoading = false;
     state.allEvents = action.payload;
   },
