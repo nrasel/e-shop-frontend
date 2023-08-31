@@ -4,13 +4,36 @@ import { AiOutlineArrowRight, AiOutlineSend } from "react-icons/ai";
 import { TfiGallery } from "react-icons/tfi";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import socketIO from "socket.io-client";
 import { server } from "../../server";
 import styles from "../../styles/styles";
+const ENDPOINT = "http://localhost:4000/";
+const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const DashboardMessages = () => {
   const { seller } = useSelector((state) => state.seller);
   const [conversations, setConversation] = useState([]);
   const [open, setOpen] = useState(false);
+  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [currentChat, setCurrentChat] = useState(null);
+  const [messages, setMessages] = useState(null);
+  const [newMessage, setNewMessage] = useState(null);
+
+  useEffect(() => {
+    socketId.on("getMessage", (data) => {
+      setArrivalMessage({
+        sender: data.senderId,
+        text: data.text,
+        createdAt: Date.now(),
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    arrivalMessage &&
+      currentChat?.members.includes(arrivalMessage.sender) &&
+      setMessages((prev) => [...prev, arrivalMessage]);
+  }, [arrivalMessage, currentChat]);
 
   useEffect(() => {
     axios
@@ -28,6 +51,41 @@ const DashboardMessages = () => {
       });
   }, [seller]);
 
+  //
+  const sendMessageHandler = async (e) => {
+    e.preventDefault();
+    const message = {
+      sender: seller._id,
+      text: newMessage,
+      conversationId: currentChat._id,
+    };
+    const receiverId = currentChat.members.find(
+      (member) => member.id !== seller._id
+    );
+
+    socketId.emit("sendMessage", {
+      senderId: seller._id,
+      receiverId,
+      text: newMessage,
+    });
+
+    try {
+      if (newMessage !== "") {
+        await axios
+          .post(`${server}/message/create-new-message`, message)
+          .then((res) => {
+            console.log(res);
+            setMessages([...messages, res.data.message]);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="w-[90%] bg-white m-5 h-[85vh] overflow-y-scroll rounded">
       {/* All messages list */}
@@ -43,16 +101,24 @@ const DashboardMessages = () => {
                 key={index}
                 index={index}
                 setOpen={setOpen}
+                setCurrentChat={setCurrentChat}
               />
             ))}
         </>
       )}
-      {open && <SellerInbox setOpen={setOpen} />}
+      {open && (
+        <SellerInbox
+          setOpen={setOpen}
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          sendMessageHandler={sendMessageHandler}
+        />
+      )}
     </div>
   );
 };
 
-const MessageList = ({ data, index, setOpen }) => {
+const MessageList = ({ data, index, setOpen, setCurrentChat }) => {
   const navigate = useNavigate();
   const [active, setActive] = useState(0);
 
@@ -66,7 +132,9 @@ const MessageList = ({ data, index, setOpen }) => {
       className={`w-full flex p-3  px-3  cursor-pointer ${
         active === index ? "bg-[#00000010]" : "bg-transparent"
       }`}
-      onClick={(e) => setActive(index) || handleClick(data?._id)}
+      onClick={(e) =>
+        setActive(index) || handleClick(data?._id) || setCurrentChat(data)
+      }
     >
       <div className="relative">
         <img
@@ -83,7 +151,12 @@ const MessageList = ({ data, index, setOpen }) => {
     </div>
   );
 };
-const SellerInbox = ({ setOpen }) => {
+const SellerInbox = ({
+  setOpen,
+  setNewMessage,
+  newMessage,
+  sendMessageHandler,
+}) => {
   return (
     <div className="w-full min-h-full flex flex-col justify-between">
       {/* message header */}
@@ -126,7 +199,7 @@ const SellerInbox = ({ setOpen }) => {
       </div>
       {/* send message input */}
       <form
-        aria-aria-required={true}
+        onSubmit={sendMessageHandler}
         className="p-3 relative w-full flex justify-between items-center"
       >
         <div className="w-[3%]">
@@ -138,6 +211,8 @@ const SellerInbox = ({ setOpen }) => {
             placeholder="Enter your message..."
             className={`${styles.input}`}
             required
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
           />
           <input type="submit" value="Send" className="hidden" id="send" />
           <label htmlFor="send">
