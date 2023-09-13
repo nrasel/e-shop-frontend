@@ -6,13 +6,14 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import socketIO from "socket.io-client";
 import { format } from "timeago.js";
-import { backend_url, server } from "../../server";
-import styles from "../../styles/styles";
+import Header from "../components/Layout/Header";
+import { backend_url, server } from "../server";
+import styles from "../styles/styles";
 const ENDPOINT = "http://localhost:4000/";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
-const DashboardMessages = () => {
-  const { seller } = useSelector((state) => state.seller);
+const UserInbox = () => {
+  const { user } = useSelector((state) => state.user);
   const [conversations, setConversations] = useState([]);
   const [open, setOpen] = useState(false);
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -43,7 +44,7 @@ const DashboardMessages = () => {
     const getConversation = async () => {
       try {
         const resonse = await axios.get(
-          `${server}/conversation/get-all-conversation-seller/${seller?._id}`,
+          `${server}/conversation/get-all-conversation-user/${user?._id}`,
           {
             withCredentials: true,
           }
@@ -51,24 +52,24 @@ const DashboardMessages = () => {
 
         setConversations(resonse.data.conversations);
       } catch (error) {
-        // console.log(error);
+        console.log(error);
       }
     };
     getConversation();
-  }, [seller, messages]);
+  }, [user]);
 
   useEffect(() => {
-    if (seller) {
-      const sellerId = seller?._id;
-      socketId.emit("addUser", sellerId);
+    if (user) {
+      const userId = user?._id;
+      socketId.emit("addUser", userId);
       socketId.on("getUsers", (data) => {
         setOnlineUsers(data);
       });
     }
-  }, [seller]);
+  }, [user]);
 
   const onlineCheck = (chat) => {
-    const chatMembers = chat.members.find((member) => member !== seller._id);
+    const chatMembers = chat.members.find((member) => member !== user._id);
     const online = onlineUsers.find((user) => user.userId === chatMembers);
 
     return online ? true : false;
@@ -95,17 +96,17 @@ const DashboardMessages = () => {
     e.preventDefault();
 
     const message = {
-      sender: seller._id,
+      sender: user._id,
       text: newMessage,
       conversationId: currentChat._id,
     };
 
     const receiverId = currentChat.members.find(
-      (member) => member.id !== seller._id
+      (member) => member.id !== user._id
     );
 
     socketId.emit("sendMessage", {
-      senderId: seller._id,
+      senderId: user._id,
       receiverId,
       text: newMessage,
     });
@@ -131,13 +132,13 @@ const DashboardMessages = () => {
   const updateLastMessage = async () => {
     socketId.emit("updateLastMessage", {
       lastMessage: newMessage,
-      lastMessageId: seller._id,
+      lastMessageId: user._id,
     });
 
     await axios
       .put(`${server}/conversation/update-last-message/${currentChat._id}`, {
         lastMessage: newMessage,
-        lastMessageId: seller._id,
+        lastMessageId: user._id,
       })
       .then((res) => {
         console.log(res.data.conversation);
@@ -147,10 +148,10 @@ const DashboardMessages = () => {
         setNewMessage("");
       });
   };
-
   return (
-    <div className="w-[90%] bg-white m-5 h-[85vh] overflow-y-scroll rounded">
-      {/* All messages list */}
+    <div className="w-full">
+      <Header />
+
       {!open && (
         <>
           <h1 className="text-center text-[20px] font-Poppins py-3">
@@ -164,7 +165,7 @@ const DashboardMessages = () => {
                 index={index}
                 setOpen={setOpen}
                 setCurrentChat={setCurrentChat}
-                me={seller._id}
+                me={user._id}
                 setUserData={setUserData}
                 userData={userData}
                 online={onlineCheck(item)}
@@ -173,6 +174,7 @@ const DashboardMessages = () => {
             ))}
         </>
       )}
+
       {open && (
         <SellerInbox
           setOpen={setOpen}
@@ -180,7 +182,7 @@ const DashboardMessages = () => {
           setNewMessage={setNewMessage}
           sendMessageHandler={sendMessageHandler}
           messages={messages}
-          sellerId={seller._id}
+          sellerId={user._id}
           userData={userData}
           activeStatus={activeStatus}
         />
@@ -200,8 +202,8 @@ const MessageList = ({
   online,
   setActiveStatus,
 }) => {
-  const navigate = useNavigate();
   const [user, setUser] = useState([]);
+  const navigate = useNavigate();
   const [active, setActive] = useState(0);
 
   const handleClick = (id) => {
@@ -210,19 +212,20 @@ const MessageList = ({
   };
 
   useEffect(() => {
+    setActiveStatus(online);
     const userId = data.members.find((user) => user !== me);
 
     const getUser = async () => {
       try {
-        const res = await axios.get(`${server}/user/user-info/${userId}`);
-        setUser(res.data.user);
+        const res = await axios.get(`${server}/shop/get-shop-info/${userId}`);
+        setUser(res.data.shop);
+        console.log(res.data.shop);
       } catch (error) {
         console.log(error);
       }
     };
     getUser();
   }, [me, data, setUserData, setActiveStatus, online]);
-
   return (
     <div
       className={`w-full flex p-3  px-3  cursor-pointer ${
@@ -230,7 +233,7 @@ const MessageList = ({
       }`}
       onClick={(e) =>
         setActive(index) ||
-        handleClick(data?._id) ||
+        handleClick(data._id) ||
         setCurrentChat(data) ||
         setUserData(user) ||
         setActiveStatus(online)
@@ -250,7 +253,7 @@ const MessageList = ({
         )}
       </div>
       <div className="pl-3">
-        <h1 className=" text-[18px]">{userData?.name}</h1>
+        <h1 className=" text-[18px]">{user?.name}</h1>
         <p className="text-[16px] text-[#000c]">
           {data?.lastMessageId !== user?._id
             ? "You:"
@@ -261,29 +264,32 @@ const MessageList = ({
     </div>
   );
 };
+
 const SellerInbox = ({
   setOpen,
-  setNewMessage,
   newMessage,
+  setNewMessage,
   sendMessageHandler,
   messages,
   sellerId,
   userData,
   activeStatus,
+  scrollRef,
+  handleImageUpload,
 }) => {
   return (
-    <div className="w-full min-h-full flex flex-col justify-between">
+    <div className="w-[full] min-h-full flex flex-col justify-between p-5">
       {/* message header */}
       <div className="w-full flex p-3 items-center justify-between bg-slate-200">
         <div className="flex">
           <img
-            className="w-[60px] h-[60px] rounded-full"
             src={`${backend_url}${userData?.avatar}`}
             alt=""
+            className="w-[60px] h-[60px] rounded-full"
           />
           <div className="pl-3">
-            <h1 className="text-[18px] font-600">{userData?.name}</h1>
-            <h1>{activeStatus ? "Active Now" : null}</h1>
+            <h1 className="text-[18px] font-[600]">{userData?.name}</h1>
+            <h1>{activeStatus ? "Active Now" : ""}</h1>
           </div>
         </div>
         <AiOutlineArrowRight
@@ -294,55 +300,79 @@ const SellerInbox = ({
       </div>
 
       {/* messages */}
-      <div className="px-3 h-[65vh]  py-3 overflow-y-scroll">
+      <div className="px-3 h-[75vh] py-3 overflow-y-scroll">
         {messages &&
           messages.map((item, index) => (
             <div
               className={`flex w-full my-2 ${
                 item.sender === sellerId ? "justify-end" : "justify-start"
               }`}
+              ref={scrollRef}
             >
               {item.sender !== sellerId && (
                 <img
-                  className="h-[40px] w-[40px]"
-                  src="http://localhost:8000/download%20(4)-1690396251882-385282865.png"
+                  src={`${backend_url}${userData?.avatar}`}
+                  className="w-[40px] h-[40px] rounded-full mr-3"
                   alt=""
                 />
               )}
-              <div>
-                <div className="w-max  bg-[#38c776] text-white p-2 rounded h-min">
-                  <p>{item.text}</p>
+              {/* {item.images && (
+                <img
+                  src={`${backend_url}${item.images}`}
+                  className="w-[300px] h-[300px] object-cover rounded-[10px] ml-2 mb-2"
+                  alt=""
+                />
+              )} */}
+              {item.text !== "" && (
+                <div>
+                  <div
+                    className={`w-max p-2 rounded ${
+                      item.sender === sellerId ? "bg-[#000]" : "bg-[#38c776]"
+                    } text-[#fff] h-min`}
+                  >
+                    <p>{item.text}</p>
+                  </div>
+
+                  <p className="text-[12px] text-[#000000d3] pt-1">
+                    {format(item.createdAt)}
+                  </p>
                 </div>
-                <p className="text-[12px] text-[#0000000d3] p-1">
-                  {format(item.createdAt)}
-                </p>
-              </div>
+              )}
             </div>
           ))}
       </div>
 
       {/* send message input */}
       <form
-        onSubmit={sendMessageHandler}
         className="p-3 relative w-full flex justify-between items-center"
+        onSubmit={sendMessageHandler}
       >
-        <div className="w-[3%]">
-          <TfiGallery size={20} className="cursor-pointer" />
+        <div className="w-[30px]">
+          <input
+            type="file"
+            name=""
+            id="image"
+            className="hidden"
+            onChange={handleImageUpload}
+          />
+          <label htmlFor="image">
+            <TfiGallery className="cursor-pointer" size={20} />
+          </label>
         </div>
-        <div className="w-[97%]">
+        <div className="w-full">
           <input
             type="text"
-            placeholder="Enter your message..."
-            className={`${styles.input}`}
             required
+            placeholder="Enter your message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            className={`${styles.input}`}
           />
           <input type="submit" value="Send" className="hidden" id="send" />
           <label htmlFor="send">
             <AiOutlineSend
-              size={25}
-              className="absolute right-4 top-[17px] cursor-pointer"
+              size={20}
+              className="absolute right-4 top-5 cursor-pointer"
             />
           </label>
         </div>
@@ -350,4 +380,4 @@ const SellerInbox = ({
     </div>
   );
 };
-export default DashboardMessages;
+export default UserInbox;

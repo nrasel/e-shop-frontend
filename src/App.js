@@ -47,6 +47,7 @@ import {
   ShopPreviewPage,
   ShopSettingsPage,
   ShopWithDrawMoneyPage,
+  UserInbox,
 } from "./routes/ShopRoutes";
 import { server } from "./server";
 
@@ -118,6 +119,14 @@ function App() {
             element={
               <ProtecTedRoute>
                 <ProfilePage />
+              </ProtecTedRoute>
+            }
+          />
+          <Route
+            path="/inbox"
+            element={
+              <ProtecTedRoute>
+                <UserInbox />
               </ProtecTedRoute>
             }
           />

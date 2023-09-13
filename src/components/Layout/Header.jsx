@@ -20,7 +20,7 @@ import Navbar from "./Navbar";
 
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
-  const { isSeller } = useSelector((state) => state.seller);
+  const { isSellerAuthenticated } = useSelector((state) => state.seller);
   const { allProducts } = useSelector((state) => state.products);
   const { cart } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
@@ -97,9 +97,12 @@ const Header = ({ activeHeading }) => {
             ) : null}
           </div>
           <div className={`${styles.button}`}>
-            <Link to="/shop-create">
+            <Link
+              to={`${isSellerAuthenticated ? "/dashboard" : "/shop-create"}`}
+            >
               <h1 className="text-[#fff] flex items-center">
-                Become Seller <IoIosArrowForward className="ml-1" />
+                {isSellerAuthenticated ? "Go Dashboard" : "Become Seller"}{" "}
+                <IoIosArrowForward className="ml-1" />
               </h1>
             </Link>
           </div>
@@ -290,9 +293,13 @@ const Header = ({ activeHeading }) => {
               </div>
               <Navbar active={activeHeading} />
               <div className={`${styles.button} ml-4 !rounded-[4px] !h-[40px]`}>
-                <Link to={`${isSeller ? "/dashboard" : "/shop-create"}`}>
+                <Link
+                  to={`${
+                    isSellerAuthenticated ? "/dashboard" : "/shop-create"
+                  }`}
+                >
                   <h1 className="text-[#fff] flex items-center">
-                    {isSeller ? "Go Dashboard" : "Become Seller"}
+                    {isSellerAuthenticated ? "Go Dashboard" : "Become Seller"}
                     <IoIosArrowForward className="ml-1" />
                   </h1>
                 </Link>

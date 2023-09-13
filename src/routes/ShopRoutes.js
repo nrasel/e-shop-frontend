@@ -11,6 +11,7 @@ import ShopOrderDetails from "../pages/Shop/ShopOrderDetails";
 import ShopPreviewPage from "../pages/Shop/ShopPreviewPage";
 import ShopSettingsPage from "../pages/Shop/ShopSettingsPage";
 import ShopWithDrawMoneyPage from "../pages/Shop/ShopWithDrawMoneyPage";
+import UserInbox from "../pages/UserInbox";
 
 export {
   ShopAllCoupouns,
@@ -26,4 +27,5 @@ export {
   ShopPreviewPage,
   ShopSettingsPage,
   ShopWithDrawMoneyPage,
+  UserInbox,
 };
