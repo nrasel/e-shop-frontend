@@ -14,6 +14,8 @@ import { getAllEvents } from "./redux/actions/event";
 import { getAllProducts } from "./redux/actions/product";
 import { loadSeller, loadUser } from "./redux/actions/user";
 import Store from "./redux/store";
+import { AdminDashboardPage } from "./routes/AdminRoutes";
+import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import ProtecTedRoute from "./routes/ProtectedRoute";
 import {
   ActivationPage,
@@ -263,6 +265,15 @@ function App() {
               <SellerProtectedRoute>
                 <ShopInboxPages />
               </SellerProtectedRoute>
+            }
+          />
+          {/* admin routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardPage />
+              </ProtectedAdminRoute>
             }
           />
         </Routes>

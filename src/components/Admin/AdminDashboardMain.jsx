@@ -1,33 +1,22 @@
 import { Button } from "@material-ui/core";
 import { DataGrid } from "@material-ui/data-grid";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { AiOutlineArrowRight, AiOutlineMoneyCollect } from "react-icons/ai";
 import { MdBorderClear } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getAllOrdersOfShop } from "../../redux/actions/order";
-import { getAllProductsShop } from "../../redux/actions/product";
+import { server } from "../../server";
+import styles from "../../styles/styles";
 
-const DashboardHero = () => {
-  const dispatch = useDispatch();
-  const { seller } = useSelector((state) => state.seller);
-  const { orders } = useSelector((state) => state.order);
-  const { products } = useSelector((state) => state.products);
-  const [deliveredOrder, setDeliveredOrder] = useState(null);
-
+const AdminDashboardMain = () => {
+  const [orders, setOrders] = useState([]);
   useEffect(() => {
-    dispatch(getAllOrdersOfShop(seller?._id));
-    dispatch(getAllProductsShop(seller._id));
-    const orderData =
-      orders && orders.filter((item) => item.status === "Delivered");
-    setDeliveredOrder(orderData);
-  }, [orders, seller._id, dispatch]);
-
-  const totalEarningWithoutTax =
-    deliveredOrder &&
-    deliveredOrder.reduce((acc, item) => acc + item.totalPrice, 0);
-  const serviceCharge = totalEarningWithoutTax * 0.1;
-  const availableBalance = totalEarningWithoutTax - serviceCharge;
+    axios
+      .get(`${server}/order/admin-all-orders`, { withCredentials: true })
+      .then((res) => {
+        setOrders(res.data.orders);
+      });
+  }, []);
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
@@ -86,15 +75,14 @@ const DashboardHero = () => {
     orders.forEach((item) => {
       row.push({
         id: item._id,
-        itemsQty: item.cart.reduce((acc, item) => acc + item.qty, 0),
-        total: "US$ " + item.totalPrice,
-        status: item.status,
+        itemsQty: item?.cart?.reduce((acc, item) => acc + item.qty, 0),
+        total: item?.totalPrice + " $",
+        status: item?.status,
       });
     });
-
   return (
-    <div className="w-full p-8">
-      <h3 className="text-[22px] font-Poppins pb-2">Overview</h3>
+    <div className="w-full p-4 ">
+      <h1 className="text-[22px] font-Poppins pb-2">Overview</h1>
       <div className="w-full block 800px:flex !items-center justify-between">
         <div className="w-full mb-4 800px:w-[30%] min-h-[20vh] bg-white shadow rounded px-2 py-5">
           <div className="flex items-center">
@@ -104,17 +92,14 @@ const DashboardHero = () => {
               fill="#00000085"
             />
             <h3
-              className={` !text-[18px] leading-5 !font-[400] text-[#00000085]`}
+              className={`${styles.productTitle} !text-[18px] leading-5 !font-[400] text-[#00000085]`}
             >
-              Account Balance
-              <span className="text-[16px]">(with 10% service charge)</span>
+              Total Earning
             </h3>
           </div>
-          <h5 className="pt-2 pl-[36px] text-[22px] font-[500]">
-            ${availableBalance.toFixed(2)}
-          </h5>
+          <h5 className="pt-2 pl-[36px] text-[22px] font-[500]">$123</h5>
           <Link to="/dashboard-withdraw-money">
-            <h5 className="pt-4 pl-2 text-[#077f9c]">Withdraw Money</h5>
+            <h5 className="pt-4 pl-2 text-[#077f9c]"> Money</h5>
           </Link>
         </div>
         <div className="w-full mb-4 800px:w-[30%] min-h-[20vh] bg-white shadow rounded px-2 py-5">
@@ -123,14 +108,12 @@ const DashboardHero = () => {
             <h3
               className={` !text-[18px] leading-5 !font-[400] text-[#00000085]`}
             >
-              All Orders
+              All Sellers
             </h3>
           </div>
-          <h5 className="pt-2 pl-[36px] text-[22px] font-[500]">
-            {orders && orders.length}
-          </h5>
-          <Link to="/dashboard-orders">
-            <h5 className="pt-4 pl-2 text-[#077f9c]">View Orers</h5>
+          <h5 className="pt-2 pl-[36px] text-[22px] font-[500]">12</h5>
+          <Link to="/admin-sellers">
+            <h5 className="pt-4 pl-2 text-[#077f9c]">View Sellers</h5>
           </Link>
         </div>
         <div className="w-full mb-4 800px:w-[30%] min-h-[20vh] bg-white shadow rounded px-2 py-5">
@@ -143,19 +126,18 @@ const DashboardHero = () => {
             <h3
               className={` !text-[18px] leading-5 !font-[400] text-[#00000085]`}
             >
-              All Products
+              All Orders
             </h3>
           </div>
-          <h5 className="pt-2 pl-[36px] text-[22px] font-[500]">
-            {products && products.length}
-          </h5>
-          <Link to="/dashboard-products">
-            <h5 className="pt-4 pl-2 text-[#077f9c]">View Products</h5>
+          <h5 className="pt-2 pl-[36px] text-[22px] font-[500]">11</h5>
+          <Link to="/admin-orders">
+            <h5 className="pt-4 pl-2 text-[#077f9c]">View Orders</h5>
           </Link>
         </div>
 
         <br />
       </div>
+      <br />
       <br />
       <h3 className="text-[22px] font-Poppins pb-2">Latest Orders</h3>
       <div className="w-full min-h-[45vh] bg-white rounded">
@@ -163,7 +145,7 @@ const DashboardHero = () => {
         <DataGrid
           rows={row}
           columns={columns}
-          pageSize={10}
+          pageSize={5}
           disableSelectionOnClick
           autoHeight
         />
@@ -172,4 +154,6 @@ const DashboardHero = () => {
   );
 };
 
-export default DashboardHero;
+export default AdminDashboardMain;
+
+// start 50 minutes

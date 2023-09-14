@@ -2,16 +2,21 @@ import axios from "axios";
 import React from "react";
 import { AiOutlineLogin, AiOutlineMessage } from "react-icons/ai";
 import { HiOutlineReceiptRefund, HiOutlineShoppingBag } from "react-icons/hi";
-import { MdOutlineTrackChanges } from "react-icons/md";
+import {
+  MdOutlineAdminPanelSettings,
+  MdOutlineTrackChanges,
+} from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { RxPerson } from "react-icons/rx";
 import { TbAddressBook } from "react-icons/tb";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { server } from "../../server";
 
 const ProfileSidebar = ({ active, setActive }) => {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
 
   const logoutHandler = () => {
     axios
@@ -118,14 +123,34 @@ const ProfileSidebar = ({ active, setActive }) => {
           Address
         </span>
       </div>
+      {user && user.role === "Admin" && (
+        <Link to="/admin/dashboard">
+          <div
+            onClick={() => setActive(8)}
+            className="flex items-center cursor-pointer w-full mb-8"
+          >
+            <MdOutlineAdminPanelSettings
+              size={20}
+              color={active === 8 ? "red" : ""}
+            />
+            <span
+              className={`pl-3 ${
+                active === 8 ? "text-[red]" : ""
+              } 800px:block hidden`}
+            >
+              Admin Dashboard
+            </span>
+          </div>
+        </Link>
+      )}
       <div
-        onClick={() => setActive(8) || logoutHandler()}
+        onClick={() => setActive(9) || logoutHandler()}
         className="flex items-center cursor-pointer w-full mb-8"
       >
-        <AiOutlineLogin size={20} color={active === 8 ? "red" : ""} />
+        <AiOutlineLogin size={20} color={active === 9 ? "red" : ""} />
         <span
           className={`pl-3 ${
-            active === 8 ? "text-[red]" : ""
+            active === 9 ? "text-[red]" : ""
           } 800px:block hidden`}
         >
           Log out
