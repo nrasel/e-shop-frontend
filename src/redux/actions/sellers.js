@@ -5,20 +5,20 @@ import { server } from "../../server";
 // get all sellers --- admin
 export const getAllSellers = () => async (dispatch) => {
   try {
-    dispatchEvent({
-      type: "getAllSellerRequestAdmin",
+    dispatch({
+      type: "getAllSellersRequest",
     });
     const { data } = await axios.get(`${server}/shop/admin-all-sellers`, {
       withCredentials: true,
     });
-    console.log(data);
+
     dispatch({
-      type: "getAllSellerSuccessAdmin",
+      type: "getAllSellersSuccess",
       payload: data.sellers,
     });
   } catch (error) {
     dispatch({
-      type: "getAllSellerFailAdmin",
+      type: "getAllSellerFailed",
       error: error.response?.data?.message,
     });
   }

@@ -21,11 +21,11 @@ export const sellerReducer = createReducer(initialState, {
   getAllSellersRequest: (state) => {
     state.isLoading = true;
   },
-  adminAllOrdersSuccess: (state, action) => {
+  getAllSellersSuccess: (state, action) => {
     state.isLoading = false;
     state.sellers = action.payload;
   },
-  adminAllOrdersFailed: (state, action) => {
+  getAllSellerFailed: (state, action) => {
     state.isLoading = false;
     state.error = action.payload;
   },

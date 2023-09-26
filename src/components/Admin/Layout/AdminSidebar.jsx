@@ -9,9 +9,9 @@ import { MdOutlineLocalOffer } from "react-icons/md";
 import { RxDashboard } from "react-icons/rx";
 import { Link } from "react-router-dom";
 
-const AdminSidebar = ({ active }) => {
+const AdminSideBar = ({ active }) => {
   return (
-    <div className="w-full h-[89vh]  bg-white shadow-sm overflow-y-scroll sticky top-0 left-0 z-10">
+    <div className="w-full h-[90vh] bg-white shadow-sm overflow-y-scroll sticky top-0 left-0 z-10">
       {/* single item */}
       <div className="w-full flex items-center p-4">
         <Link to="/admin/dashboard" className="w-full flex items-center">
@@ -20,8 +20,8 @@ const AdminSidebar = ({ active }) => {
             color={`${active === 1 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
-              active === 1 ? "text-[crimson]" : "text-[#fff]"
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+              active === 1 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
             Dashboard
@@ -36,7 +36,7 @@ const AdminSidebar = ({ active }) => {
             color={`${active === 2 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
               active === 2 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
@@ -52,7 +52,7 @@ const AdminSidebar = ({ active }) => {
             color={`${active === 3 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
               active === 3 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
@@ -68,7 +68,7 @@ const AdminSidebar = ({ active }) => {
             color={`${active === 4 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
               active === 4 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
@@ -81,7 +81,7 @@ const AdminSidebar = ({ active }) => {
         <Link to="/admin-products" className="w-full flex items-center">
           <BsHandbag size={30} color={`${active === 5 ? "crimson" : "#555"}`} />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
               active === 5 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
@@ -89,6 +89,7 @@ const AdminSidebar = ({ active }) => {
           </h5>
         </Link>
       </div>
+
       <div className="w-full flex items-center p-4">
         <Link to="/admin-events" className="w-full flex items-center">
           <MdOutlineLocalOffer
@@ -96,7 +97,7 @@ const AdminSidebar = ({ active }) => {
             color={`${active === 6 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
               active === 6 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
@@ -106,32 +107,30 @@ const AdminSidebar = ({ active }) => {
       </div>
 
       <div className="w-full flex items-center p-4">
-        <Link
-          to="/dashboard-withdraw-money"
-          className="w-full flex items-center"
-        >
+        <Link to="/admin-withdraw-request" className="w-full flex items-center">
           <CiMoneyBill
             size={30}
             color={`${active === 7 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
               active === 7 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
-            Withdraw Money
+            Withdraw Request
           </h5>
         </Link>
       </div>
+
       <div className="w-full flex items-center p-4">
         <Link to="/profile" className="w-full flex items-center">
           <AiOutlineSetting
             size={30}
-            color={`${active === 7 ? "crimson" : "#555"}`}
+            color={`${active === 8 ? "crimson" : "#555"}`}
           />
           <h5
-            className={`800px:block hidden pl-2 text-[18px] font-[400]  ${
-              active === 7 ? "text-[crimson]" : "text-[#555]"
+            className={`hidden 800px:block pl-2 text-[18px] font-[400] ${
+              active === 8 ? "text-[crimson]" : "text-[#555]"
             }`}
           >
             Settings
@@ -142,4 +141,4 @@ const AdminSidebar = ({ active }) => {
   );
 };
 
-export default AdminSidebar;
+export default AdminSideBar;

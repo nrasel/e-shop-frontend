@@ -14,7 +14,15 @@ import { getAllEvents } from "./redux/actions/event";
 import { getAllProducts } from "./redux/actions/product";
 import { loadSeller, loadUser } from "./redux/actions/user";
 import Store from "./redux/store";
-import { AdminDashboardPage, AdminDashboardUsers } from "./routes/AdminRoutes";
+import {
+  AdminDashboardEvent,
+  AdminDashboardOrders,
+  AdminDashboardPage,
+  AdminDashboardProducts,
+  AdminDashboardSellers,
+  AdminDashboardUsers,
+  AdminDashboardWithdraw,
+} from "./routes/AdminRoutes";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import ProtecTedRoute from "./routes/ProtectedRoute";
 import {
@@ -281,6 +289,46 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <AdminDashboardUsers />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-seller"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardSellers />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-orders"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardOrders />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-products"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardProducts />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-events"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardEvent />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin-withdraw-request"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboardWithdraw />
               </ProtectedAdminRoute>
             }
           />
